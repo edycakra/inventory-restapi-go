@@ -28,12 +28,24 @@ func getInventory(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(inventory)
 }
 
+func createItem(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var item Item
+	_ = json.NewDecoder(r.Body).Decode(&item) //get the data that we input
+
+	inventory = append(inventory, item) //store the data
+
+	json.NewEncoder(w).Encode(item)
+}
+
 func handleRequests() {
 	router := mux.NewRouter().StrictSlash(true)
 
 	//list of routes
 	router.HandleFunc("/", homePage).Methods("GET")
 	router.HandleFunc("/inventory", getInventory).Methods("GET")
+	router.HandleFunc("/inventory", createItem).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":3000", router))
 }
